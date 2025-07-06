@@ -11,7 +11,8 @@ This file contains the core logic for the search algorithms
 required for the project.
 -------------------------------------------------------
 """
-
+import heapq
+import math
 # =======================================================
 # SECTION 1: CORE DATA STRUCTURES & HEURISTICS
 # =======================================================
