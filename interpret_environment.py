@@ -5,11 +5,12 @@
 Author:  Max Mortensen
 ID:  169065545
 Email: mort5545@mylaurier.ca
-__updated__ = "2025-07-03"
+__updated__ = "2025-07-06"
 -------------------------------------------------------
 """
 
 from robot import Robot
+
 
 
 def read_robot_file(filepath):
@@ -35,9 +36,17 @@ def read_robot_file(filepath):
     return (grid_rows, grid_cols), robot_positions, goal_position, grid
 
 
+def create_blank_grid_with_X(grid):
+    rows = len(grid)
+    cols = len(grid[0]) if rows > 0 else 0
+    return [['X' for _ in range(cols)] for _ in range(rows)]
+
+
 def main():
     filepath = "robot_room.txt"  # or provide full path
     grid_size, robot_starts, goal_pos, grid = read_robot_file(filepath)
+
+    gridx = create_blank_grid_with_X(grid)
 
     print(f"Grid size: {grid_size}")
     print(f"Goal position: {goal_pos}")
@@ -45,21 +54,22 @@ def main():
     for row in grid:
         print(' '.join(row))
 
-    print("\nRobots:")
+    # print("\nRobots:")
     robots = []
     for pos in robot_starts:
-        robot = Robot(start_pos=pos, grid_dimensions=grid_size,
-                      goal_pos=goal_pos, grid=grid)
+        robot = Robot2(start_pos=pos, grid_dimensions=grid_size,
+                       goal_pos=goal_pos, gridx=gridx)
         robots.append(robot)
         print(robot)
 
-    robots[0].state()
+    robots[0].state(grid)
     print()
     print(robots[0].record)
-    robots[0].state()
+
     print()
-    print(robots[0].record)
+    print(robots[0])
 
 
 if __name__ == "__main__":
     main()
+
