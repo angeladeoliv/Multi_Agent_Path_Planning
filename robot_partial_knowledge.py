@@ -5,14 +5,18 @@
 Author:  Rameen Amin
 ID:  169068460
 Email: amin8460@mylaurier.ca
-__updated__ = "2025-07-08"
+__updated__ = "2025-07-11"
 -------------------------------------------------------
 """
 
 from search_algorithms import a_star_search, manhattan_distance
 
+
 class Robot:
+    robot_positions = {}  # Class-level dict: {robot_id: (x, y)}
+
     def __init__(self, robot_id, start_pos, grid_dimensions, goal_pos, full_map, sensor_radius=2):
+
         self.id = robot_id
         self.start_row, self.start_col = start_pos
         self.goal_row, self.goal_col = goal_pos
@@ -25,7 +29,8 @@ class Robot:
         self.pos_x, self.pos_y = start_pos
 
         self.record = []  # stores (symbol, x, y)
-        self.local_map = [['?' for _ in range(self.grid_cols)] for _ in range(self.grid_rows)]
+        self.local_map = [
+            ['?' for _ in range(self.grid_cols)] for _ in range(self.grid_rows)]
 
         self.path = []
         self.sense_environment()
@@ -53,7 +58,8 @@ class Robot:
         start = self.position
         goal = (self.goal_row, self.goal_col)
         print(f"[Robot {self.id}] Planning path from {start} to {goal}...")
-        path = a_star_search(self.local_map, start, goal, heuristic_func=manhattan_distance)
+        path = a_star_search(self.local_map, start, goal,
+                             heuristic_func=manhattan_distance)
         if path:
             self.path = path[1:]
             print(f"[Robot {self.id}] Path found: {self.path}")
@@ -66,10 +72,20 @@ class Robot:
         if not self.path:
             print(f"[Robot {self.id}] No path to follow.")
             return
+
+        # Remove previous 'R' from map
+        prev_x, prev_y = self.pos_x, self.pos_y
+        self.local_map[prev_x][prev_y] = '0'
+
+        # Move
         next_pos = self.path.pop(0)
         self.position = next_pos
         self.pos_x, self.pos_y = next_pos
         print(f"[Robot {self.id}] Moved to {self.position}")
+
+        # Update class-level robot position tracking
+        Robot.robot_positions[self.id] = (self.pos_x, self.pos_y)
+
         self.sense_environment()
 
     def share_knowledge(self):
@@ -92,6 +108,17 @@ class Robot:
         print(f"\n[Robot {self.id}] Local Map View:")
         for row in self.local_map:
             print(" ".join(str(cell) for cell in row))
+
+    # def print_local_map(self):
+    #     print(f"\n[Robot {self.id}] Local Map View:")
+    #     for i in range(self.grid_rows):
+    #         row = []
+    #         for j in range(self.grid_cols):
+    #             if (i, j) == (self.pos_x, self.pos_y):
+    #                 row.append('R')
+    #             else:
+    #                 row.append(str(self.local_map[i][j]))
+    #         print(" ".join(row))
 
     def __repr__(self):
         return (f"Robot(id={self.id}, start=({self.start_row},{self.start_col}), "
