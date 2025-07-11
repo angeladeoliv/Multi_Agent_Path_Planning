@@ -6,13 +6,13 @@ import time
 
 def update_all_robot_positions(robots):
     for robot in robots:
-        # Clear all old 'R's (in case shared)
+        # Clear old robot positions (R)
         for i in range(robot.grid_rows):
             for j in range(robot.grid_cols):
                 if robot.local_map[i][j] == 'R':
                     robot.local_map[i][j] = '0'
 
-        # Re-mark the current robot positions
+        # Re-mark current positions of all robots
         for rid, (x, y) in Robot.robot_positions.items():
             robot.local_map[x][y] = 'R'
 
@@ -33,22 +33,23 @@ def run_simulation():
     print_grid_initial(full_map)
 
     # === Initialize robots ===
-    robot1 = Robot(
-        robot_id=1, start_pos=robot_starts[0], goal_pos=goal_pos, grid_dimensions=grid_size, full_map=full_map)
-
-    if len(robot_starts) > 1:
-        robot2 = Robot(
-            robot_id=2, start_pos=robot_starts[1], goal_pos=goal_pos, grid_dimensions=grid_size, full_map=full_map)
-        robots = [robot1, robot2]
-    else:
-        robots = [robot1]
+    robots = []
+    for idx, start_pos in enumerate(robot_starts[:4], start=1):  # max 4 robots
+        robot = Robot(
+            robot_id=idx,
+            start_pos=start_pos,
+            goal_pos=goal_pos,
+            grid_dimensions=grid_size,
+            full_map=full_map
+        )
+        robots.append(robot)
 
     # === Plan initial paths ===
     for robot in robots:
         robot.plan_path()
 
-    # === Run simulation (5 steps or until all reach goal) ===
-    for t in range(10):
+    # === Run simulation ===
+    for t in range(50):
         print(f"\n--- Time Step {t} ---")
 
         # Move each robot
@@ -56,18 +57,22 @@ def run_simulation():
             if robot.position != (robot.goal_row, robot.goal_col):
                 robot.move()
 
-        # Share and receive knowledge
+        # Share knowledge among all robots
         for sender in robots:
             shared_data = sender.share_knowledge()
             for receiver in robots:
                 if receiver != sender:
                     receiver.receive_knowledge(shared_data)
 
+        # Update robot positions in all maps
         update_all_robot_positions(robots)
 
-        # Print local maps
-        for robot in robots:
-            robot.print_local_map()
+        # Print each robot's local map
+        # for robot in robots:
+        #     robot.print_local_map()
+
+        # All robots essentially share a map we are printing the same map n times
+        robots[0].print_local_map()
 
         # Stop early if all robots reached goal
         if all(robot.position == (robot.goal_row, robot.goal_col) for robot in robots):
