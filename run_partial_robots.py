@@ -3,12 +3,27 @@ from robot_partial_knowledge import Robot
 from grid_renderer import print_grid_initial  # optional
 import time
 
+
+def update_all_robot_positions(robots):
+    for robot in robots:
+        # Clear all old 'R's (in case shared)
+        for i in range(robot.grid_rows):
+            for j in range(robot.grid_cols):
+                if robot.local_map[i][j] == 'R':
+                    robot.local_map[i][j] = '0'
+
+        # Re-mark the current robot positions
+        for rid, (x, y) in Robot.robot_positions.items():
+            robot.local_map[x][y] = 'R'
+
+
 def run_simulation():
     filepath = "robot_room.txt"
     try:
         grid_size, robot_starts, goal_pos, full_map = read_robot_file(filepath)
     except FileNotFoundError:
-        print(f"Error: '{filepath}' not found. Run 'create_environment.py' first.")
+        print(
+            f"Error: '{filepath}' not found. Run 'create_environment.py' first.")
         return
 
     print("--- Environment Loaded ---")
@@ -18,10 +33,12 @@ def run_simulation():
     print_grid_initial(full_map)
 
     # === Initialize robots ===
-    robot1 = Robot(robot_id=1, start_pos=robot_starts[0], goal_pos=goal_pos, grid_dimensions=grid_size, full_map=full_map)
-    
+    robot1 = Robot(
+        robot_id=1, start_pos=robot_starts[0], goal_pos=goal_pos, grid_dimensions=grid_size, full_map=full_map)
+
     if len(robot_starts) > 1:
-        robot2 = Robot(robot_id=2, start_pos=robot_starts[1], goal_pos=goal_pos, grid_dimensions=grid_size, full_map=full_map)
+        robot2 = Robot(
+            robot_id=2, start_pos=robot_starts[1], goal_pos=goal_pos, grid_dimensions=grid_size, full_map=full_map)
         robots = [robot1, robot2]
     else:
         robots = [robot1]
@@ -46,6 +63,8 @@ def run_simulation():
                 if receiver != sender:
                     receiver.receive_knowledge(shared_data)
 
+        update_all_robot_positions(robots)
+
         # Print local maps
         for robot in robots:
             robot.print_local_map()
@@ -56,6 +75,7 @@ def run_simulation():
             break
 
         time.sleep(0.5)  # optional pause to simulate time
+
 
 if __name__ == "__main__":
     run_simulation()
