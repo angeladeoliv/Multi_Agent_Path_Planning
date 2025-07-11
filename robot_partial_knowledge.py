@@ -15,7 +15,7 @@ from search_algorithms import a_star_search, manhattan_distance
 class Robot:
     robot_positions = {}  # Class-level dict: {robot_id: (x, y)}
 
-    def __init__(self, robot_id, start_pos, grid_dimensions, goal_pos, full_map, sensor_radius=2):
+    def __init__(self, robot_id, start_pos, grid_dimensions, goal_pos, full_map, sensor_radius=1):
 
         self.id = robot_id
         self.start_row, self.start_col = start_pos
@@ -104,21 +104,26 @@ class Robot:
             print(f"[Robot {self.id}] Received new info. Replanning path.")
             self.plan_path()
 
-    def print_local_map(self):
-        print(f"\n[Robot {self.id}] Local Map View:")
-        for row in self.local_map:
-            print(" ".join(str(cell) for cell in row))
-
     # def print_local_map(self):
     #     print(f"\n[Robot {self.id}] Local Map View:")
-    #     for i in range(self.grid_rows):
-    #         row = []
-    #         for j in range(self.grid_cols):
-    #             if (i, j) == (self.pos_x, self.pos_y):
-    #                 row.append('R')
-    #             else:
-    #                 row.append(str(self.local_map[i][j]))
-    #         print(" ".join(row))
+    #     for row in self.local_map:
+    #         print(" ".join(str(cell) for cell in row))
+
+    def print_local_map(self):
+        "ORIGINAL Print_local_map right above"
+        print(f"\n[Robot {self.id}] Local Map View:")
+
+        emoji_map = {
+            '0': '\u25FB\uFE0F',     # ◻️ White square = free space
+            '1': '\U0001FAA8',       # 🪨 Rock = obstacle
+            'R': '\U0001F916',       # 🤖 Robot
+            'G': '\U0001F6A9',       # 🚩 Red flag (goal)
+            '?': '\u2B1B',           # ⬛ Black square (unknown)
+        }
+
+        for row in self.local_map:
+            visual_row = [emoji_map.get(str(cell), str(cell)) for cell in row]
+            print(" ".join(visual_row))
 
     def __repr__(self):
         return (f"Robot(id={self.id}, start=({self.start_row},{self.start_col}), "
