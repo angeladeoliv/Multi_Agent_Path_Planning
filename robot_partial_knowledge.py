@@ -2,10 +2,10 @@
 -------------------------------------------------------
 [updated robot class]
 -------------------------------------------------------
-Author:  Rameen Amin
-ID:  169068460
-Email: amin8460@mylaurier.ca
-__updated__ = "2025-07-11"
+Author:  Rameen Amin, Zayd Syed
+ID:  169068460, 169029110
+Email: amin8460@mylaurier.ca, syed9110@mylaurier.ca
+__updated__ = "2025-07-11", 2025-07-18
 -------------------------------------------------------
 """
 
@@ -39,6 +39,11 @@ class Robot:
         if 0 <= row < self.grid_rows and 0 <= col < self.grid_cols:
             return grid[row][col]
         return '?'  # out of bounds is unknown
+    
+    #Used to help update paths if the bot is stuck
+    def replan(self, new_goal):
+        self.goal_row, self.goal_col = new_goal
+        self.plan_path()
 
     def sense_environment(self):
         """Scan local area and update local map."""
@@ -53,20 +58,42 @@ class Robot:
                     if record not in self.record:
                         self.record.append(record)
 
-    def plan_path(self):
-        """Plans a path from current position to goal using A* and the local map."""
-        start = self.position
-        goal = (self.goal_row, self.goal_col)
-        print(f"[Robot {self.id}] Planning path from {start} to {goal}...")
-        path = a_star_search(self.local_map, start, goal,
-                             heuristic_func=manhattan_distance)
-        if path:
-            self.path = path[1:]
-            print(f"[Robot {self.id}] Path found: {self.path}")
-        else:
-            self.path = []
-            print(f"[Robot {self.id}] No path found.")
 
+    #Updated to stop obstacle phasing(TO add comments)
+    def plan_path(self):
+            """Plans a path from current position to goal using A* and the local map."""    
+            start = self.position
+            goal = (self.goal_row, self.goal_col)
+            print(f"[Robot {self.id}] Planning path from {start} to {goal}...")
+            path = a_star_search(self.local_map, start, goal,
+                                heuristic_func=manhattan_distance)
+            if path:
+                self.path = path[1:]
+                print(f"[Robot {self.id}] Path found: {self.path}")
+            else:
+                print(f"[Robot {self.id}] No path to goal. Trying to explore unknowns...")
+
+                # Look for the nearest '?' tile and go explore it
+                unknown_tiles = []
+                for r in range(self.grid_rows):
+                    for c in range(self.grid_cols):
+                        if self.local_map[r][c] == '?':
+                            unknown_tiles.append((r, c))
+
+                # Try to path to nearest '?'
+                if unknown_tiles:
+                    unknown_tiles.sort(key=lambda pos: abs(pos[0] - self.pos_x) + abs(pos[1] - self.pos_y))
+                    for target in unknown_tiles:
+                        explore_path = a_star_search(self.local_map, start, target,
+                                                    heuristic_func=manhattan_distance)
+                        if explore_path:
+                            self.path = explore_path[1:]
+                            print(f"[Robot {self.id}] Exploring toward unknown at {target}")
+                            return
+                    print(f"[Robot {self.id}] No reachable unknowns found.")
+                else:
+                    print(f"[Robot {self.id}] Entire map explored. No path.")
+                self.path = []
     def move(self):
         """Move one step along the path."""
         if not self.path:
@@ -79,6 +106,13 @@ class Robot:
 
         # Move
         next_pos = self.path.pop(0)
+
+        true_value = self.get_symbol_at(self.full_map, next_pos[0], next_pos[1])
+        local_value = self.get_symbol_at(self.local_map, next_pos[0], next_pos[1])
+        if true_value == '1':
+            print(f"🚨 [Robot {self.id}] PHASED THROUGH OBSTACLE at {next_pos}!")
+            print(f"    🔍 Local map saw: '{local_value}' | Full map actually: '1'")
+
         self.position = next_pos
         self.pos_x, self.pos_y = next_pos
         print(f"[Robot {self.id}] Moved to {self.position}")
