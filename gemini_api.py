@@ -2,13 +2,14 @@
 -------------------------------------------------------
 Gemini API Integration
 -------------------------------------------------------
-Author:  Rahnuma Haque
-ID:  169024593
-Email: haqu4593@mylaurier.ca
+Author:  Rahnuma Haque, Suvethan Yogathasan
+ID:  169024593, 169039244
+Email: haqu4593@mylaurier.ca, yoga9244@mylaurier.ca
 __updated__ = "2025-07-19"
 -------------------------------------------------------
 """
 
+import os
 import logging
 from google import genai
 from interpret_environment import read_robot_file
@@ -20,7 +21,9 @@ logging.basicConfig(
     filename='gemini_api.log'
 )
 
-API_KEY = "AIzaSyDyqtSKRLCB99HbP7v7lxr8r-Y0co6AwtQ"
+API_KEY = os.getenv("GEMINI_API_KEY")
+if not API_KEY:
+    raise ValueError("GEMINI_API_KEY not set in environment variables.")
 client = genai.Client(api_key=API_KEY)
 
 def query_gemini(prompt):
