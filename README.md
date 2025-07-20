@@ -50,7 +50,7 @@ python create_environment.py
 # 4. Run basic test
 python run_search.py --file robot_room.txt --include-gemini
 
-# 5. Run detailed comparison for PDF analysis
+# 5. Run detailed comparison for analysis
 python gemini_comparison.py
 ```
 
@@ -102,12 +102,12 @@ python run_search.py --compare --file robot_room.txt
 - Basic performance comparison
 - Recommendation to use detailed comparison script
 
-### Step 5: Detailed Comparison for PDF Analysis
-Generate data for your assignment PDF:
+### Step 5: Detailed Comparison for Analysis
+Generate data for Reporting purposes:
 ```bash
 python gemini_comparison.py
 ```
-**Purpose**: Collects detailed comparison data for PDF analysis.
+**Purpose**: Collects detailed comparison data for Algorithm analysis.
 **Expected Output**:
 - Execution time measurements
 - Path length comparisons
@@ -128,7 +128,7 @@ python gemini_comparison.py
 | Command | Purpose |
 |---------|---------|
 | `python run_search.py --compare` | Basic comparison between algorithms |
-| `python gemini_comparison.py` | Detailed comparison for PDF analysis |
+| `python gemini_comparison.py` | Detailed comparison for algorithm analysis |
 
 ### Advanced Options
 | Option | Description |
@@ -183,7 +183,7 @@ Multi_Agent_Path_Planning/
 ├── run_partial_robots.py             # Partial knowledge robot implementation
 ├── search_algorithms.py              # Core pathfinding algorithms
 ├── gemini_api_client.py              # Gemini API integration
-├── gemini_comparison.py              # Comparison for PDF analysis
+├── gemini_comparison.py              # Comparison for algorithm analysis
 ├── interpret_environment.py          # Environment file parser
 ├── grid_renderer.py                  # Visualization functions
 ├── robot.py                          # Robot class implementation
