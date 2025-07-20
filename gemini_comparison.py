@@ -2,13 +2,10 @@
 -------------------------------------------------------
 Simple Gemini API Comparison for Assignment
 -------------------------------------------------------
-Author: [Your Name]
-ID: [Your ID]
-Email: [Your Email]
+Author: Bilal Rashid, Rahnuma Haque
+ID: 210648510, 169024593
+Email: rash8510@mylaurier.ca, haqu4593@mylaurier.ca
 __updated__ = "2025-07-20"
--------------------------------------------------------
-Basic implementation for comparing Gemini API with manual algorithms.
-Focuses on data collection for PDF analysis rather than extensive automation.
 -------------------------------------------------------
 """
 
@@ -22,15 +19,11 @@ import google.generativeai as genai
 from search_algorithms import a_star_search, greedy_bfs_search, weighted_a_star_search, manhattan_distance
 from interpret_environment import read_robot_file
 
-# Load environment variables
 load_dotenv()
 
-
 class SimpleGeminiClient:
-    """Simple Gemini API client for pathfinding comparison."""
     
     def __init__(self):
-        """Initialize the Gemini API client."""
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
             raise ValueError("GEMINI_API_KEY not found in .env file")
@@ -39,7 +32,6 @@ class SimpleGeminiClient:
         self.model = genai.GenerativeModel('gemini-1.5-flash')
     
     def generate_path(self, grid: List[List[str]], start: Tuple[int, int], goal: Tuple[int, int]) -> Optional[List[Tuple[int, int]]]:
-        """Generate a path using Gemini API."""
         try:
             # Create simple prompt
             grid_str = "\n".join([" ".join(row) for row in grid])
@@ -62,9 +54,8 @@ Return only coordinates like: [(0,0), (0,1), (1,1)]"""
             return None
     
     def _parse_path(self, response_text: str) -> Optional[List[Tuple[int, int]]]:
-        """Parse path from API response."""
         try:
-            # Simple parsing - look for coordinate pairs
+            # simple parsing (look for coordinate pairs)
             import re
             coords = re.findall(r'\((\d+),\s*(\d+)\)', response_text)
             if coords:
@@ -75,10 +66,8 @@ Return only coordinates like: [(0,0), (0,1), (1,1)]"""
 
 
 class SimpleComparison:
-    """Simple comparison between manual algorithms and Gemini API."""
     
     def __init__(self):
-        """Initialize comparison system."""
         self.gemini_client = SimpleGeminiClient()
         self.algorithms = {
             "A* Manhattan": lambda grid, start, goal: a_star_search(grid, start, goal, manhattan_distance),
@@ -87,7 +76,6 @@ class SimpleComparison:
         }
     
     def run_single_comparison(self, grid: List[List[str]], start: Tuple[int, int], goal: Tuple[int, int]) -> Dict:
-        """Run comparison for a single scenario."""
         results = {
             'scenario': f"Start: {start}, Goal: {goal}",
             'grid_size': f"{len(grid)}x{len(grid[0])}",
@@ -96,14 +84,13 @@ class SimpleComparison:
             'timestamp': time.strftime("%Y-%m-%d %H:%M:%S")
         }
         
-        # Test manual algorithms
         for name, algorithm in self.algorithms.items():
             start_time = time.perf_counter()
             try:
                 path = algorithm(grid, start, goal)
                 end_time = time.perf_counter()
                 
-                execution_time = (end_time - start_time) * 1000  # Convert to ms
+                execution_time = (end_time - start_time) * 1000  # ms conversion
                 
                 results['manual_algorithms'][name] = {
                     'success': path is not None,
@@ -119,13 +106,13 @@ class SimpleComparison:
                     'path_length': 0
                 }
         
-        # Test Gemini API
+        # test Gemini API
         start_time = time.perf_counter()
         try:
             path = self.gemini_client.generate_path(grid, start, goal)
             end_time = time.perf_counter()
             
-            execution_time = (end_time - start_time) * 1000  # Convert to ms
+            execution_time = (end_time - start_time) * 1000  # ms conversion
             
             results['gemini_api'] = {
                 'success': path is not None,
@@ -144,22 +131,21 @@ class SimpleComparison:
         return results
     
     def validate_path(self, path: List[Tuple[int, int]], grid: List[List[str]], start: Tuple[int, int], goal: Tuple[int, int]) -> bool:
-        """Simple path validation."""
         if not path or len(path) < 2:
             return False
         
-        # Check start and end
+        # check start and end
         if path[0] != start or path[-1] != goal:
             return False
         
-        # Check bounds and obstacles
+        # check bounds and obstacles
         for row, col in path:
             if not (0 <= row < len(grid) and 0 <= col < len(grid[0])):
                 return False
             if grid[row][col] == '1':
                 return False
         
-        # Check adjacency
+        # check adjacency
         for i in range(1, len(path)):
             prev_row, prev_col = path[i-1]
             curr_row, curr_col = path[i]
@@ -173,7 +159,7 @@ class SimpleComparison:
         return True
     
     def save_results(self, results: Dict, filename: str = None):
-        """Save comparison results to JSON file."""
+        # save comparison results as .JSON
         if filename is None:
             timestamp = time.strftime("%Y%m%d_%H%M%S")
             filename = f"comparison_results_{timestamp}.json"
@@ -184,7 +170,6 @@ class SimpleComparison:
         print(f"Results saved to: {filename}")
     
     def print_summary(self, results: Dict):
-        """Print a simple summary of results."""
         print("\n" + "="*60)
         print("PATHFINDING ALGORITHM COMPARISON SUMMARY")
         print("="*60)
@@ -208,7 +193,6 @@ class SimpleComparison:
         length = gemini.get('path_length', 0)
         print(f"  {'Gemini API':15}: {status:7} | {time_ms:6.2f}ms | Length: {length}")
         
-        # Find optimal path length
         successful_lengths = []
         for result in results['manual_algorithms'].values():
             if result['success'] and result['path_length'] > 0:
@@ -220,7 +204,6 @@ class SimpleComparison:
             optimal_length = min(successful_lengths)
             print(f"\nOptimal Path Length: {optimal_length}")
             
-            # Show which algorithms found optimal paths
             print("Optimal Solutions:")
             for name, result in results['manual_algorithms'].items():
                 if result['success'] and result['path_length'] == optimal_length:
@@ -230,11 +213,9 @@ class SimpleComparison:
 
 
 def main():
-    """Main function for running simple comparison."""
     print("Simple Gemini API Pathfinding Comparison")
     print("="*50)
     
-    # Load environment
     try:
         grid_size, robot_starts, goal_pos, grid = read_robot_file("robot_room.txt")
         print(f"Environment loaded: {grid_size[0]}x{grid_size[1]} grid")
@@ -250,19 +231,15 @@ def main():
         print("Error: No robots found in environment.")
         return
     
-    # Run comparison
     comparison = SimpleComparison()
     
-    # Test with first robot
     start_pos = robot_starts[0]
     print(f"\nRunning comparison from {start_pos} to {goal_pos}")
     
     results = comparison.run_single_comparison(grid, start_pos, goal_pos)
     
-    # Display results
     comparison.print_summary(results)
     
-    # Save results
     comparison.save_results(results)
     
     print(f"\n{'='*60}")
