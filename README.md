@@ -50,8 +50,8 @@ python create_environment.py
 # 4. Run basic test
 python run_search.py --file robot_room.txt --include-gemini
 
-# 5. Run comprehensive analysis
-python run_comprehensive_comparison.py --file robot_room.txt --single-robot
+# 5. Run detailed comparison for PDF analysis
+python gemini_comparison.py
 ```
 
 ## Detailed Testing Instructions
@@ -91,34 +91,29 @@ python run_search.py --file robot_room.txt --include-gemini
 **Purpose**: Adds Gemini API pathfinding to the traditional algorithm tests.
 **Expected Output**: Same as Step 2, plus Gemini API results (if API key is configured).
 
-### Step 4: Performance Comparison Mode
-Run detailed performance analysis:
+### Step 4: Simple Comparison Mode
+Run basic comparison for assignment data collection:
 ```bash
-# Single robot detailed comparison
-python run_search.py --compare --single-robot --file robot_room.txt
-
-# Multi-robot comparison (tests each robot separately)
 python run_search.py --compare --file robot_room.txt
 ```
-**Purpose**: Measures execution times, success rates, and path optimality.
+**Purpose**: Basic comparison between algorithms and Gemini API.
 **Expected Output**:
-- Performance metrics for each algorithm
-- Success/failure status
-- Optimal path identification
-- Execution times in milliseconds
+- Simple success/failure status for each algorithm
+- Basic performance comparison
+- Recommendation to use detailed comparison script
 
-### Step 5: Comprehensive Analysis and Reporting
-Generate detailed analysis reports:
+### Step 5: Detailed Comparison for PDF Analysis
+Generate data for your assignment PDF:
 ```bash
-python run_comprehensive_comparison.py --file robot_room.txt --single-robot
+python gemini_comparison.py
 ```
-**Purpose**: Creates comprehensive performance reports with pros/cons analysis.
+**Purpose**: Collects detailed comparison data for PDF analysis.
 **Expected Output**:
-- Executive summary with top performers
-- Detailed algorithm analysis
-- Pros and cons for each approach
-- Use case recommendations
-- Generated report files in `comparison_results/` directory
+- Execution time measurements
+- Path length comparisons
+- Success rate analysis
+- JSON file with raw data for charts/tables
+- Summary suitable for assignment documentation
 
 ## Command Reference
 
@@ -132,9 +127,8 @@ python run_comprehensive_comparison.py --file robot_room.txt --single-robot
 ### Comparison Commands
 | Command | Purpose |
 |---------|---------|
-| `python run_search.py --compare --single-robot` | Compare algorithms using first robot only |
-| `python run_search.py --compare` | Compare algorithms using all robots |
-| `python run_comprehensive_comparison.py --single-robot` | Generate comprehensive analysis report |
+| `python run_search.py --compare` | Basic comparison between algorithms |
+| `python gemini_comparison.py` | Detailed comparison for PDF analysis |
 
 ### Advanced Options
 | Option | Description |
@@ -183,15 +177,13 @@ Multi_Agent_Path_Planning/
 ├── README.md                           # This documentation
 ├── requirements.txt                    # Python dependencies
 ├── .env                               # API key configuration (create this)
+├── .gitignore                         # Git ignore file
 ├── create_environment.py              # Environment generation utility
 ├── run_search.py                      # Main pathfinding test script
-├── run_comprehensive_comparison.py    # Comprehensive analysis script
 ├── run_partial_robots.py             # Partial knowledge robot implementation
 ├── search_algorithms.py              # Core pathfinding algorithms
 ├── gemini_api_client.py              # Gemini API integration
-├── comparison_runner.py               # Performance comparison orchestration
-├── performance_analyzer.py           # Performance metrics and analysis
-├── path_validator.py                 # Path validation utilities
+├── gemini_comparison.py              # Simple comparison for PDF analysis
 ├── interpret_environment.py          # Environment file parser
 ├── grid_renderer.py                  # Visualization functions
 ├── robot.py                          # Robot class implementation

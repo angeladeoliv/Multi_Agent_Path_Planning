@@ -17,8 +17,7 @@ import sys
 from interpret_environment import read_robot_file
 from search_algorithms import a_star_search, greedy_bfs_search, weighted_a_star_search, manhattan_distance, euclidean_distance
 from grid_renderer import visualize_path, print_grid_initial
-from comparison_runner import ComparisonRunner, ComparisonConfig
-from gemini_api_client import GeminiAPIClient
+from gemini_comparison import SimpleGeminiClient
 
 def run_and_display(algo_name, search_func, grid, start, goal, heuristic, **kwargs):
     """Helper to run a search and display its results."""
@@ -37,7 +36,7 @@ def run_gemini_comparison(grid, start, goal):
     print(f"\n===== Running Gemini API =====")
     
     try:
-        client = GeminiAPIClient()
+        client = SimpleGeminiClient()
         path = client.generate_path(grid, start, goal)
         
         if path:
@@ -48,8 +47,14 @@ def run_gemini_comparison(grid, start, goal):
     except Exception as e:
         print(f"Error running Gemini API: {str(e)}")
 
-def run_comparison_mode(filepath, algorithms=None, single_robot=False):
-    """Run comprehensive comparison between algorithms and Gemini API."""
+def run_simple_comparison(filepath):
+    """Run simple comparison using the basic comparison tool."""
+    print("--- Starting Simple Comparison Mode ---")
+    print("Use 'python gemini_comparison.py' for detailed comparison data.")
+    print("This mode is for basic algorithm testing only.")
+    print("-" * 50)
+    
+    # Just run the basic algorithms for comparison
     try:
         grid_size, robot_starts, goal_pos, grid = read_robot_file(filepath)
     except FileNotFoundError:
@@ -59,65 +64,41 @@ def run_comparison_mode(filepath, algorithms=None, single_robot=False):
     if not robot_starts:
         print("Error: No robots found in the environment file.")
         return
-
-    print("--- Starting Comparison Mode ---")
-    print(f"Grid Size: {grid_size}")
-    print(f"Goal: {goal_pos}")
-    print(f"Robots: {len(robot_starts)}")
-    print("-" * 40)
-
-    # Configure comparison
-    config = ComparisonConfig()
-    if algorithms:
-        config.include_algorithms = algorithms
     
-    runner = ComparisonRunner(config)
+    start_pos = robot_starts[0]
+    print(f"Testing algorithms from {start_pos} to {goal_pos}")
     
-    if single_robot:
-        # Compare using only the first robot
-        start_pos = robot_starts[0]
-        print(f"Running single robot comparison from {start_pos}")
-        result = runner.run_single_comparison(grid, start_pos, goal_pos)
-        
-        # Display results
-        print("\n--- Comparison Results ---")
-        print(f"Scenario: {result.scenario_id}")
-        print(f"Grid Size: {result.grid_size}")
-        print(f"Start: {result.start_pos}, Goal: {result.goal_pos}")
-        
-        print("\nManual Algorithms:")
-        for name, path_result in result.manual_results.items():
-            status = "SUCCESS" if path_result.success else "FAILED"
-            time_ms = path_result.execution_time
-            length = path_result.path_length if path_result.success else "N/A"
-            optimal = "OPTIMAL" if path_result.is_optimal else ""
-            print(f"  {name}: {status} | {time_ms:.2f}ms | Length: {length} {optimal}")
-        
-        print(f"\nGemini API:")
-        gemini = result.gemini_result
-        status = "SUCCESS" if gemini.success else "FAILED"
-        time_ms = gemini.execution_time
-        length = gemini.path_length if gemini.success else "N/A"
-        optimal = "OPTIMAL" if gemini.is_optimal else ""
-        print(f"  Gemini API: {status} | {time_ms:.2f}ms | Length: {length} {optimal}")
-        
-    else:
-        # Compare using all robots
-        print(f"Running multi-robot comparison with {len(robot_starts)} robots")
-        results = runner.run_multiple_robots(robot_starts, goal_pos, grid)
-        
-        # Display summary
-        print(f"\n--- Multi-Robot Comparison Summary ---")
-        successful_comparisons = sum(1 for r in results if r.gemini_result.success or any(mr.success for mr in r.manual_results.values()))
-        print(f"Successful comparisons: {successful_comparisons}/{len(results)}")
-        
-        # Show per-robot summary
-        for i, result in enumerate(results):
-            print(f"\nRobot {i+1} (from {result.start_pos}):")
-            manual_successes = sum(1 for r in result.manual_results.values() if r.success)
-            gemini_success = "SUCCESS" if result.gemini_result.success else "FAILED"
-            print(f"  Manual algorithms: {manual_successes}/{len(result.manual_results)} successful")
-            print(f"  Gemini API: {gemini_success}")
+    # Run basic algorithms
+    heuristic = manhattan_distance
+    algorithms = [
+        ("A* Search", a_star_search),
+        ("Greedy BFS", greedy_bfs_search),
+        ("Weighted A*", lambda g, s, e, h: weighted_a_star_search(g, s, e, h, weight=1.5))
+    ]
+    
+    for name, algo in algorithms:
+        try:
+            path = algo(grid, start_pos, goal_pos, heuristic)
+            if path:
+                print(f"{name}: SUCCESS - Length {len(path)-1}")
+            else:
+                print(f"{name}: FAILED")
+        except Exception as e:
+            print(f"{name}: ERROR - {e}")
+    
+    # Test Gemini API
+    try:
+        client = SimpleGeminiClient()
+        path = client.generate_path(grid, start_pos, goal_pos)
+        if path:
+            print(f"Gemini API: SUCCESS - Length {len(path)-1}")
+        else:
+            print(f"Gemini API: FAILED")
+    except Exception as e:
+        print(f"Gemini API: ERROR - {e}")
+    
+    print("\nFor detailed comparison data, run:")
+    print("python gemini_comparison.py")
 
 def parse_arguments():
     """Parse command line arguments."""
@@ -175,10 +156,7 @@ def main():
     
     # Handle comparison mode
     if args.compare:
-        algorithms = None
-        if args.algorithms:
-            algorithms = [alg.strip() for alg in args.algorithms.split(',')]
-        run_comparison_mode(args.file, algorithms, args.single_robot)
+        run_simple_comparison(args.file)
         return
     
     # Traditional mode with optional Gemini integration
