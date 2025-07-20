@@ -183,7 +183,7 @@ Multi_Agent_Path_Planning/
 ├── run_partial_robots.py             # Partial knowledge robot implementation
 ├── search_algorithms.py              # Core pathfinding algorithms
 ├── gemini_api_client.py              # Gemini API integration
-├── gemini_comparison.py              # Simple comparison for PDF analysis
+├── gemini_comparison.py              # Comparison for PDF analysis
 ├── interpret_environment.py          # Environment file parser
 ├── grid_renderer.py                  # Visualization functions
 ├── robot.py                          # Robot class implementation
@@ -208,18 +208,6 @@ Based on testing with different grid sizes:
 ### Complex Grid (15x15, 3+ robots):
 - **Manual Algorithms**: 0.1-1.0ms, high success rate
 - **Gemini API**: 1000-3000ms, variable performance
-
-## Assignment Requirements Coverage
-
-This implementation addresses the following assignment components:
-
-✅ **Environment Design**: Grid-based environments with obstacles and multiple robots  
-✅ **Search Algorithms**: A*, Greedy BFS, Weighted A* implementations  
-✅ **Heuristic Strategies**: Manhattan and Euclidean distance heuristics  
-✅ **Gemini API Integration**: Complete API integration with performance comparison  
-✅ **Performance Metrics**: Execution time, path optimality, success rates  
-✅ **Visualization**: Grid rendering and path visualization  
-✅ **Documentation**: Comprehensive testing and usage instructions  
 
 ## Notes
 
