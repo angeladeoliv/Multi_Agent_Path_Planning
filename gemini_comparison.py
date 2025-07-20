@@ -1,6 +1,6 @@
 """
 -------------------------------------------------------
-Simple Gemini API Comparison for Assignment
+Gemini API Comparison
 -------------------------------------------------------
 Author: Bilal Rashid, Rahnuma Haque
 ID: 210648510, 169024593
