@@ -209,9 +209,3 @@ Based on testing with different grid sizes:
 - **Manual Algorithms**: 0.1-1.0ms, high success rate
 - **Gemini API**: 1000-3000ms, variable performance
 
-## Notes
-
-- The Gemini API requires an active internet connection and valid API key
-- Log files are automatically generated during execution for debugging
-- All generated files (environments, results, logs) are gitignored for clean repository management
-- The system is designed to handle API failures gracefully and continue with manual algorithms
