@@ -21,7 +21,7 @@ from interpret_environment import read_robot_file
 
 load_dotenv()
 
-class SimpleGeminiClient:
+class GeminiClient:
     
     def __init__(self):
         api_key = os.getenv("GEMINI_API_KEY")
@@ -33,7 +33,6 @@ class SimpleGeminiClient:
     
     def generate_path(self, grid: List[List[str]], start: Tuple[int, int], goal: Tuple[int, int]) -> Optional[List[Tuple[int, int]]]:
         try:
-            # Create simple prompt
             grid_str = "\n".join([" ".join(row) for row in grid])
             
             prompt = f"""Find a path from {start} to {goal} in this grid:
@@ -55,7 +54,7 @@ Return only coordinates like: [(0,0), (0,1), (1,1)]"""
     
     def _parse_path(self, response_text: str) -> Optional[List[Tuple[int, int]]]:
         try:
-            # simple parsing (look for coordinate pairs)
+            # look for coordinate pairs
             import re
             coords = re.findall(r'\((\d+),\s*(\d+)\)', response_text)
             if coords:
@@ -65,10 +64,10 @@ Return only coordinates like: [(0,0), (0,1), (1,1)]"""
             return None
 
 
-class SimpleComparison:
+class Comparing:
     
     def __init__(self):
-        self.gemini_client = SimpleGeminiClient()
+        self.gemini_client = GeminiClient()
         self.algorithms = {
             "A* Manhattan": lambda grid, start, goal: a_star_search(grid, start, goal, manhattan_distance),
             "Greedy BFS": lambda grid, start, goal: greedy_bfs_search(grid, start, goal, manhattan_distance),
@@ -213,7 +212,7 @@ class SimpleComparison:
 
 
 def main():
-    print("Simple Gemini API Pathfinding Comparison")
+    print("Gemini API Pathfinding Comparison")
     print("="*50)
     
     try:
@@ -231,7 +230,7 @@ def main():
         print("Error: No robots found in environment.")
         return
     
-    comparison = SimpleComparison()
+    comparison = Comparing()
     
     start_pos = robot_starts[0]
     print(f"\nRunning comparison from {start_pos} to {goal_pos}")
