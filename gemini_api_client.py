@@ -201,7 +201,7 @@ Example format: [(0,0), (0,1), (1,1), (2,1)]
                     self.logger.warning(f"Coordinate {(row, col)} at index {i} is out of bounds")
                     return False
                     
-                # Check for obstacles (but allow start 'R' and goal 'G')
+                # check for obstacles (allow start 'R' and goal 'G')
                 cell_value = grid[row][col]
                 if cell_value == '1':
                     self.logger.warning(f"Path goes through obstacle at {(row, col)}")
