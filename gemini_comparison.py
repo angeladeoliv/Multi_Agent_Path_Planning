@@ -35,12 +35,20 @@ class GeminiClient:
         try:
             grid_str = "\n".join([" ".join(row) for row in grid])
             
-            prompt = f"""Find a path from {start} to {goal} in this grid:
 
-Grid (0=free, 1=obstacle):
+            prompt = f"""
+You are navigating a robot on a 2D grid from a START position to a GOAL position.
+
+- The grid contains '0' (free space) and '1' (obstacles).
+- You can only move UP, DOWN, LEFT, or RIGHT (no diagonals).
+- You CANNOT pass through or land on obstacles.
+- Stay within the bounds of the grid.
+- Return a valid path from {start} to {goal}, as a list of coordinate tuples.
+- Return ONLY the path as Python code, e.g., [(x1,y1), (x2,y2), ..., (xn,yn)].
+
+Grid:
 {grid_str}
-
-Return only coordinates like: [(0,0), (0,1), (1,1)]"""
+"""
 
             response = self.model.generate_content(prompt)
             
