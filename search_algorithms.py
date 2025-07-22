@@ -27,6 +27,9 @@ class Node:
         self.g = 0  # Cost from start to current node
         self.h = 0  # Heuristic cost from current node to end
         self.f = 0  # Total cost (g + h)
+        # SMA*
+        self.depth = parent.depth + 1 if parent else 0
+        self.children = []
 
     def __eq__(self, other):
         return self.position == other.position
@@ -184,3 +187,64 @@ def weighted_a_star_search(grid, start_pos, end_pos, heuristic_func, weight=1.5)
             heapq.heappush(open_list, neighbor)
 
     return None
+
+def sma_star_search(grid, start_pos, end_pos, heuristic_func, max_nodes=50):
+     """
+    Simplified Memory-Bounded A* (SMA*) search implementation.
+    
+    Navina Thayaruban - 169069359
+    Angela De Oliveira - 169039719
+    """
+
+    start_node = Node(None, start_pos)
+    end_node = Node(None, end_pos)
+    start_node.h = heuristic_func(start_node, end_node)
+    start_node.f = start_node.h
+
+    open_list = []
+    closed_set = set()
+
+    heapq.heappush(open_list, start_node)
+
+    while open_list: # pruning
+        if len(open_list) > max_nodes:
+            worst = max(open_list, key=lambda n: (n.f, -n.depth))
+            open_list.remove(worst)
+            heapq.heapify(open_list)
+
+            if worst.parent:
+                siblings = [c for c in worst.parent.children if c != worst]
+                if siblings:
+                    best_f = min(child.f for child in siblings)
+                    worst.parent.f = max(worst.parent.f, best_f)
+
+        current_node = heapq.heappop(open_list)
+
+        if current_node.position in closed_set:
+            continue
+        closed_set.add(current_node.position)
+
+        if current_node.position == end_node.position:
+            return _reconstruct_path(current_node)
+
+        for move in [(0, 1), (0, -1), (1, 0), (-1, 0)]:
+            row, col = current_node.position[0] + move[0], current_node.position[1] + move[1]
+
+            if not (0 <= row < len(grid) and 0 <= col < len(grid[0])) or \
+               grid[row][col] == '1':
+                continue
+
+            position = (row, col)
+            if position in closed_set:
+                continue
+
+            neighbor = Node(current_node, position)
+            neighbor.g = current_node.g + 1
+            neighbor.h = heuristic_func(neighbor, end_node)
+            neighbor.f = neighbor.g + neighbor.h
+            neighbor.depth = current_node.depth + 1
+
+            current_node.children.append(neighbor)
+            heapq.heappush(open_list, neighbor)
+
+    return None # if path not found
