@@ -2,9 +2,9 @@
 -------------------------------------------------------
 Gemini API Client
 -------------------------------------------------------
-Author:  Rahnuma Haque, Suvethan Yogathasan
-ID:  169024593, 169039244
-Email: haqu4593@mylaurier.ca, yoga9244@mylaurier.ca
+Author:  Rahnuma Haque, Suvethan Yogathasan, Bilal Rashid
+ID:  169024593, 169039244, 210648510
+Email: haqu4593@mylaurier.ca, yoga9244@mylaurier.ca, rash8510@mylaurier.ca
 __updated__ = "2025-07-20"
 -------------------------------------------------------
 """
