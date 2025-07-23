@@ -189,7 +189,7 @@ def weighted_a_star_search(grid, start_pos, end_pos, heuristic_func, weight=1.5)
     return None
 
 def sma_star_search(grid, start_pos, end_pos, heuristic_func, max_nodes=50):
-     """
+    """
     Simplified Memory-Bounded A* (SMA*) search implementation.
     
     Navina Thayaruban - 169069359
