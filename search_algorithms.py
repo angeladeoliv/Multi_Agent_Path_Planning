@@ -266,3 +266,26 @@ def relaxed_derived_heuristic(node_a, node_b):
     if path is None:
         return float('inf')  # no path is found
     return len(path) - 1  # number of steps
+
+def learned_heuristic(node_a, node_b, grid, radius=3, w1=3, w2=1):
+    """
+    Learned heuristic: A linear combination of weighted obstacle density
+    and goal distance.
+
+    Angela De Oliveira - 169039719
+    """
+    rows, cols = len(grid), len(grid[0])
+    x, y = node_a.position
+    obstacle_count = 0
+
+    for dx in range(-radius, radius + 1):
+        for dy in range(-radius, radius + 1):
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < rows and 0 <= ny < cols:
+                if grid[nx][ny] == '1':
+                    obstacle_count += 1
+
+    distance = manhattan_distance(node_a, node_b)
+
+    return (w1 * obstacle_count) + (w2 * distance)
+
