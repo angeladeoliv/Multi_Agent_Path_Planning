@@ -248,3 +248,21 @@ def sma_star_search(grid, start_pos, end_pos, heuristic_func, max_nodes=50):
             heapq.heappush(open_list, neighbor)
 
     return None # if path not found
+
+def relaxed_derived_heuristic(node_a, node_b):
+    """
+    The relaxed-problem derived heuristic that uses optimal path 
+    lengths from an obstacle-free map. 
+    
+    Equivalent to running A* on an obstacle-free map. 
+    
+    Angela De Oliveira - 169039719
+    """
+    rows = max(node_a.position[0], node_b.position[0]) + 1
+    cols = max(node_a.position[1], node_b.position[1]) + 1
+    t_grid = [['0' for _ in range(cols)] for _ in range(rows)]
+    
+    path = a_star_search(t_grid, node_a.position, node_b.position, manhattan_distance)
+    if path is None:
+        return float('inf')  # no path is found
+    return len(path) - 1  # number of steps
